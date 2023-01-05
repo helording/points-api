@@ -45,6 +45,14 @@ defmodule PointsApiWeb.CustomerController do
     render(conn, "show.json", customer: customer)
   end
 
+  # how can we reduce the number of these functions???
+  def show(conn, %{"phone" => phone, "email" => email}) do
+    case Admin.get_customer(%{"phone" => phone, "email" => email}) do
+      nil -> render(conn, "show.json", error: "No customer with that phone")
+      customer -> render(conn, "show.json", customer: customer)
+    end
+  end
+
   def show(conn, %{"email" => email}) do
     case Admin.get_customer(%{"email" => email, "phone" => nil}) do
       nil -> render(conn, "show.json", error: "No customer with that email")
