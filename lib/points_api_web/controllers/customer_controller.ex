@@ -3,6 +3,7 @@ defmodule PointsApiWeb.CustomerController do
 
   alias PointsApi.Admin
   alias PointsApi.Admin.Customer
+  alias PointsApiWeb.ControllerHelpers
 
   action_fallback PointsApiWeb.FallbackController
 
@@ -30,25 +31,13 @@ defmodule PointsApiWeb.CustomerController do
         conn
         |> put_status(:conflict)
         #|> put_resp_header("location", Routes.customer_path(conn, :show, changeset_error_to_string(changeset)))
-        |> render("show.json", error: changeset_error_to_string(changeset))
+        |> render("show.json", error: ControllerHelpers.changeset_error_to_string(changeset))
       {:ok, customer} ->
         conn
         |> put_status(:created)
         #|> put_resp_header("location", Routes.customer_path(conn, :show, customer))
         |> render("show.json", customer: customer)
     end
-  end
-
-  def changeset_error_to_string(changeset) do
-    Ecto.Changeset.traverse_errors(changeset, fn {msg, opts} ->
-      Enum.reduce(opts, msg, fn {key, value}, acc ->
-        String.replace(acc, "%{#{key}}", to_string(value))
-      end)
-    end)
-    |> Enum.reduce("", fn {k, v}, acc ->
-      joined_errors = Enum.join(v, "; ")
-      "#{acc}#{k}: #{joined_errors}\n"
-    end)
   end
 
   def show(conn, %{"id" => id}) do
@@ -78,11 +67,20 @@ defmodule PointsApiWeb.CustomerController do
     end
   end
 
-  def update(conn, %{"customer" => customer_params}) do
+  def update(conn, %{"customer" => customer_params, "amount" => amount}) do
     customer = Admin.get_customer(customer_params)
 
-    with {:ok, %Customer{} = customer} <- Admin.update_customer(customer, customer_params) do
-      render(conn, "show.json", customer: customer)
+    case Admin.update_customer(customer, %{balance: customer.balance + amount}) do
+      {:ok, update_customer} ->
+        conn
+        |> put_status(:accepted)
+        #|> IO.inspect(update_customer)
+        |> render("show.json", customer: update_customer)
+      {:error, changeset} ->
+        conn
+        |> put_status(:bad_request)
+        |> render("show.json", error: ControllerHelpers.changeset_error_to_string(changeset))
+        |> halt()
     end
   end
 

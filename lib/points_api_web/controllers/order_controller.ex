@@ -2,6 +2,7 @@ defmodule PointsApiWeb.OrderController do
   use PointsApiWeb, :controller
 
   alias PointsApi.Admin
+  alias PointsApiWeb.ControllerHelpers
 
   action_fallback PointsApiWeb.FallbackController
 
@@ -15,17 +16,15 @@ defmodule PointsApiWeb.OrderController do
         |> halt()
 
       customer ->
-        updated_balance = customer.balance + div(amount,100)
-        cond do
-          updated_balance >= 0 ->
-            Admin.update_customer(customer, %{balance: updated_balance})
+        case Admin.update_customer(customer, %{balance: customer.balance + div(amount,100)}) do
+          {:ok, update_customer} ->
             conn
             |> put_status(:accepted)
-            |> render("show.json", order: %{balance_before: customer.balance, balance_after: updated_balance})
-          updated_balance < 0 ->
+            |> render("show.json", order: %{balance_before: customer.balance, balance_after: update_customer.balance})
+          {:error, changeset} ->
             conn
             |> put_status(:bad_request)
-            |> render("show.json", error: "Balance out of range")
+            |> render("show.json", error: ControllerHelpers.changeset_error_to_string(changeset))
             |> halt()
         end
     end

@@ -10,6 +10,7 @@ defmodule PointsApiWeb.Router do
 
     #put "/customers/:id/", CustomerController
     resources "/customers", CustomerController
+    put "/customers", CustomerController, :update
     get "/customer", CustomerController, :show
 
     post "/orders/new", OrderController, :create

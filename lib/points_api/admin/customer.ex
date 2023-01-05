@@ -12,14 +12,6 @@ defmodule PointsApi.Admin.Customer do
     timestamps()
   end
 
-  @spec changeset(
-          {map, map}
-          | %{
-              :__struct__ => atom | %{:__changeset__ => map, optional(any) => any},
-              optional(atom) => any
-            },
-          :invalid | %{optional(:__struct__) => none, optional(atom | binary) => any}
-        ) :: Ecto.Changeset.t()
   @doc false
   def changeset(customer, attrs) do
     customer
@@ -27,7 +19,7 @@ defmodule PointsApi.Admin.Customer do
     |> validate_one_of_present([:email, :phone])
     |> unique_constraint(:email)
     |> unique_constraint(:phone)
-    |> unique_constraint(:phone)
+    |> validate_number(:balance, greater_than_or_equal_to: 0)
   end
 
   """
