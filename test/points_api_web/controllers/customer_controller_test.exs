@@ -6,16 +6,20 @@ defmodule PointsApiWeb.CustomerControllerTest do
   alias PointsApi.Admin.Customer
 
   @create_attrs %{
-    balance: 42,
-    email: "some email",
-    phone: "some phone"
+    "balance" => 42,
+    "email" => "some email",
+    "phone" => "some phone"
   }
   @update_attrs %{
     balance: 43,
-    email: "some updated email",
-    phone: "some updated phone"
+    email: "some email",
+    phone: "some phone"
   }
-  @invalid_attrs %{balance: nil, email: nil, phone: nil}
+  @invalid_attrs %{
+    balance: nil,
+    email: nil,
+    phone: nil
+  }
 
   setup %{conn: conn} do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
@@ -53,7 +57,7 @@ defmodule PointsApiWeb.CustomerControllerTest do
     setup [:create_customer]
 
     test "renders customer when data is valid", %{conn: conn, customer: %Customer{id: id} = customer} do
-      conn = put(conn, Routes.customer_path(conn, :update, customer), customer: @update_attrs)
+      conn = put(conn, Routes.customer_path(conn, :update), customer: @update_attrs)
       assert %{"id" => ^id} = json_response(conn, 200)["data"]
 
       conn = get(conn, Routes.customer_path(conn, :show, id))
@@ -61,13 +65,13 @@ defmodule PointsApiWeb.CustomerControllerTest do
       assert %{
                "id" => ^id,
                "balance" => 43,
-               "email" => "some updated email",
-               "phone" => "some updated phone"
+               "email" => "some email",
+               "phone" => "some phone"
              } = json_response(conn, 200)["data"]
     end
 
     test "renders errors when data is invalid", %{conn: conn, customer: customer} do
-      conn = put(conn, Routes.customer_path(conn, :update, customer), customer: @invalid_attrs)
+      conn = put(conn, Routes.customer_path(conn, :update), customer: @invalid_attrs)
       assert json_response(conn, 400)["errors"] != %{}
     end
   end

@@ -54,6 +54,10 @@ defmodule PointsApi.Admin do
     Repo.get_by(Customer, [email: email, phone: phone])
   end
 
+  def get_customer(%{"email" => email, "phone" => phone, "balance" => _}) do
+    Repo.get_by(Customer, [email: email, phone: phone])
+  end
+
 
   @doc """
   Creates a customer.

@@ -53,29 +53,49 @@ defmodule PointsApiWeb.CustomerController do
   # how can we reduce the number of these functions???
   def show(conn, %{"phone" => phone, "email" => email}) do
     case Admin.get_customer(%{"phone" => phone, "email" => email}) do
-      nil -> render(conn, "show.json", error: "No customer with that phone")
-      customer -> render(conn, "show.json", customer: customer)
+      nil ->
+        conn
+        |> put_status(:bad_request)
+        |> render("show.json", error: "No customer with those credentials")
+      customer ->
+        conn
+        |> put_status(:ok)
+        |> render("show.json", customer: customer)
     end
   end
 
   def show(conn, %{"email" => email}) do
     case Admin.get_customer(%{"email" => email, "phone" => nil}) do
-      nil -> render(conn, "show.json", error: "No customer with that email")
-      customer -> render(conn, "show.json", customer: customer)
+      nil ->
+        conn
+        |> put_status(:bad_request)
+        |> render("show.json", error: "No customer with that email")
+      customer ->
+        conn
+        |> put_status(:ok)
+        |> render("show.json", customer: customer)
     end
   end
 
   def show(conn, %{"phone" => phone}) do
     case Admin.get_customer(%{"phone" => phone, "email" => nil}) do
-      nil -> render(conn, "show.json", error: "No customer with that phone")
-      customer -> render(conn, "show.json", customer: customer)
+      nil ->
+        conn
+        |> put_status(:bad_request)
+        |> render("show.json", error: "No customer with that phone")
+      customer ->
+        conn
+        |> put_status(:ok)
+        |> render("show.json", customer: customer)
     end
   end
 
   def update(conn, %{"customer" => customer_params}) do
     customer = case Admin.get_customer(customer_params) do
       nil ->
-        render(conn, "show.json", error: "No customer with those credentials")
+        conn
+        |> put_status(:bad_request)
+        |> render("show.json", error: "No customer with those credentials")
         |> halt()
       customer -> customer
     end
@@ -88,7 +108,9 @@ defmodule PointsApiWeb.CustomerController do
   def update(conn, %{"customer" => customer_params, "amount" => amount}) do
     customer = case Admin.get_customer(customer_params) do
       nil ->
-        render(conn, "show.json", error: "No customer with those credentials")
+        conn
+        |> put_status(:bad_request)
+        |> render("show.json", error: "No customer with those credentials")
         |> halt()
       customer -> customer
     end
