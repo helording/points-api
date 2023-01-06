@@ -12,8 +12,8 @@ defmodule PointsApi.AdminFixtures do
       attrs
       |> Enum.into(%{
         balance: 42,
-        email: "some email",
-        phone: "some phone"
+        email: "s@s",
+        phone: "123"
       })
       |> PointsApi.Admin.create_customer()
 

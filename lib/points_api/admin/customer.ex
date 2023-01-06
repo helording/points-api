@@ -25,7 +25,8 @@ defmodule PointsApi.Admin.Customer do
     |> validate_one_of_present([:email, :phone])
     |> unique_constraint(:email)
     |> unique_constraint(:phone)
-
+    |> validate_format(:email, ~r/@/)
+    |> validate_format(:phone, ~r/\A\+?[0-9]{3,}/)
     |> validate_number(:balance, greater_than_or_equal_to: 0)
   end
 

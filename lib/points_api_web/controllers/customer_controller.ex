@@ -146,12 +146,10 @@ defmodule PointsApiWeb.CustomerController do
         conn
         |> put_status(:bad_request)
         |> render("show.json", error: "No customer with those credentials")
-        exit(:shutdown)
-      customer -> customer
-    end
-
-    with {:ok, %Customer{}} <- Admin.delete_customer(customer) do
-      send_resp(conn, :no_content, "")
+      customer ->
+        with {:ok, %Customer{}} <- Admin.delete_customer(customer) do
+          send_resp(conn, :no_content, "")
+        end
     end
   end
 end
