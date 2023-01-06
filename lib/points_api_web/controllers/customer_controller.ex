@@ -1,4 +1,9 @@
 defmodule PointsApiWeb.CustomerController do
+  @moduledoc """
+    Provides methods for handling requests sent to the customer routes.
+  """
+
+
   use PointsApiWeb, :controller
   require IEx
 
@@ -15,11 +20,17 @@ defmodule PointsApiWeb.CustomerController do
     IO.puts "============"
 """
 
+  @doc """
+    Returns a list of maps representing all customers in the database.
+  """
   def index(conn, _params) do
     customers = Admin.list_customers()
     render(conn, "index.json", customers: customers)
   end
 
+  @doc """
+    Create a customer from a customer tuple. Requires an valid email or phone number".
+  """
   def create(conn, %{"customer" => customer}) do
 
     inital_balance = case Map.has_key?(customer, "balance") do
@@ -91,6 +102,9 @@ defmodule PointsApiWeb.CustomerController do
     end
   end
 
+  @doc """
+    Updates a customer from a customer tuple. Requires an valid email or phone number".
+  """
   def update(conn, %{"customer" => customer_params}) do
     customer = case Admin.get_customer(customer_params) do
       nil ->
