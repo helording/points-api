@@ -6,7 +6,8 @@ defmodule PointsApiWeb.OrderController do
 
   action_fallback PointsApiWeb.FallbackController
 
-  def create(conn, %{"order" => %{"paid" => amount, "percentage" => percentage}, "customer" => customer}) do
+  def create(conn, %{"order" => %{"paid" => amount} = order, "customer" => customer}) do
+    percentage = Map.get(order, "percentage", 1)
 
     case Admin.get_customer(customer) do
       nil ->
@@ -30,4 +31,10 @@ defmodule PointsApiWeb.OrderController do
     end
   end
 
+"""
+Not standard
+  def create(conn, %{"order" => %{"paid" => amount}, "customer" => customer}) do
+    create(conn, %{"order" => %{"paid" => amount, "percentage" => 1}, "customer" => customer})
+  end
+"""
 end

@@ -130,8 +130,6 @@ defmodule PointsApiWeb.CustomerController do
       customer -> customer
     end
 
-    #IEx.pry()
-
     case Admin.update_customer(customer, %{balance: customer.balance + amount}) do
       {:ok, update_customer} ->
         conn
