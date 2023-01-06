@@ -1,5 +1,6 @@
 defmodule PointsApiWeb.CustomerController do
   use PointsApiWeb, :controller
+  require IEx
 
   alias PointsApi.Admin
   alias PointsApi.Admin.Customer
@@ -97,11 +98,10 @@ defmodule PointsApiWeb.CustomerController do
         |> put_status(:bad_request)
         |> render("show.json", error: "No customer with those credentials")
         |> halt()
-      customer -> customer
-    end
-
-    with {:ok, %Customer{} = customer} <- Admin.update_customer(customer, customer_params) do
-      render(conn, "show.json", customer: customer)
+      customer ->
+        with {:ok, %Customer{} = customer} <- Admin.update_customer(customer, customer_params) do
+          render(conn, "show.json", customer: customer)
+        end
     end
   end
 
@@ -112,8 +112,11 @@ defmodule PointsApiWeb.CustomerController do
         |> put_status(:bad_request)
         |> render("show.json", error: "No customer with those credentials")
         |> halt()
+        exit(:shutdown)
       customer -> customer
     end
+
+    #IEx.pry()
 
     case Admin.update_customer(customer, %{balance: customer.balance + amount}) do
       {:ok, update_customer} ->
@@ -131,6 +134,21 @@ defmodule PointsApiWeb.CustomerController do
 
   def delete(conn, %{"id" => id}) do
     customer = Admin.get_customer!(id)
+
+    with {:ok, %Customer{}} <- Admin.delete_customer(customer) do
+      send_resp(conn, :no_content, "")
+    end
+  end
+
+  def delete(conn, %{"customer" => customer_params}) do
+    customer = case Admin.get_customer(customer_params) do
+      nil ->
+        conn
+        |> put_status(:bad_request)
+        |> render("show.json", error: "No customer with those credentials")
+        exit(:shutdown)
+      customer -> customer
+    end
 
     with {:ok, %Customer{}} <- Admin.delete_customer(customer) do
       send_resp(conn, :no_content, "")

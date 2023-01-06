@@ -84,7 +84,7 @@ defmodule PointsApiWeb.CustomerControllerTest do
       assert response(conn, 204)
 
       assert_error_sent 400, fn ->
-        get(conn, Routes.customer_path(conn, :show, customer))
+        get(conn, Routes.customer_path(conn, :show, customer.email))
       end
     end
   end

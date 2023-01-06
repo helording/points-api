@@ -38,6 +38,8 @@ curl -X GET http://localhost:4000/api/customer/\?phone=0447683664 -H "Content-Ty
 curl -X GET http://localhost:4000/api/customer/\?email=example@lunaris.com -H "Content-Type: application/json" -d ""
 curl -X GET http://localhost:4000/api/customer/\?phone=0447683664&email=example@lunaris.com -H "Content-Type: application/json" -d ""
 
+curl -X GET http://localhost:4000/api/customer/\?phone=null&email=null&balance=null -H "Content-Type: application/json" -d ""
+
 ==============================================
 To process an order and add points to the account based on percentage. If an account doesn't exist, make an account
 POST http://localhost:4000/api/orders/new -d {order => %{paid => amount}, customer => {email: email, phone: phone}}
