@@ -12,13 +12,20 @@ defmodule PointsApi.Admin.Customer do
     timestamps()
   end
 
+  @castable ~w(
+    email
+    phone
+    balance
+  )a
+
   @doc false
   def changeset(customer, attrs) do
     customer
-    |> cast(attrs, [:email, :phone, :balance])
+    |> cast(attrs, @castable)
     |> validate_one_of_present([:email, :phone])
     |> unique_constraint(:email)
     |> unique_constraint(:phone)
+
     |> validate_number(:balance, greater_than_or_equal_to: 0)
   end
 
@@ -35,7 +42,6 @@ defmodule PointsApi.Admin.Customer do
       end
     end)
     |> case do
-      # feel like theres a better way to do this?
       [_] ->
         changeset
       [_, _] ->

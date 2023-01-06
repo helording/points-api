@@ -11,7 +11,7 @@ defmodule PointsApiWeb.OrderController do
     case Admin.get_customer(customer) do
       nil ->
         conn
-        |> put_status(:conflict)
+        |> put_status(:bad_request)
         |> render("show.json", error: "Customer does not exist")
         |> halt()
 

@@ -10,5 +10,6 @@ defmodule PointsApi.Repo.Migrations.CreateCustomers do
 
       timestamps()
     end
+
   end
 end

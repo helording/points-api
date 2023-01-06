@@ -45,7 +45,7 @@ defmodule PointsApiWeb.CustomerControllerTest do
 
     test "renders errors when data is invalid", %{conn: conn} do
       conn = post(conn, Routes.customer_path(conn, :create), customer: @invalid_attrs)
-      assert json_response(conn, 422)["errors"] != %{}
+      assert json_response(conn, 400)["errors"] != %{}
     end
   end
 
@@ -68,7 +68,7 @@ defmodule PointsApiWeb.CustomerControllerTest do
 
     test "renders errors when data is invalid", %{conn: conn, customer: customer} do
       conn = put(conn, Routes.customer_path(conn, :update, customer), customer: @invalid_attrs)
-      assert json_response(conn, 422)["errors"] != %{}
+      assert json_response(conn, 400)["errors"] != %{}
     end
   end
 
@@ -79,7 +79,7 @@ defmodule PointsApiWeb.CustomerControllerTest do
       conn = delete(conn, Routes.customer_path(conn, :delete, customer))
       assert response(conn, 204)
 
-      assert_error_sent 404, fn ->
+      assert_error_sent 400, fn ->
         get(conn, Routes.customer_path(conn, :show, customer))
       end
     end
@@ -89,4 +89,5 @@ defmodule PointsApiWeb.CustomerControllerTest do
     customer = customer_fixture()
     %{customer: customer}
   end
+
 end

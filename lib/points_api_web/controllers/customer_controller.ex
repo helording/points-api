@@ -21,21 +21,26 @@ defmodule PointsApiWeb.CustomerController do
 
   def create(conn, %{"customer" => customer}) do
 
+    inital_balance = case Map.has_key?(customer, "balance") do
+      true -> customer["balance"]
+      false -> 0
+    end
+
     result = case Admin.get_customer(customer) do
-      nil -> Admin.create_customer(Map.put(customer, "balance", 0))
+      nil -> Admin.create_customer(Map.put(customer, "balance", inital_balance))
       customer -> {:ok, customer}
     end
 
     case result do
       {:error, changeset} ->
         conn
-        |> put_status(:conflict)
-        #|> put_resp_header("location", Routes.customer_path(conn, :show, changeset_error_to_string(changeset)))
+        |> put_status(:bad_request)
+        |> put_resp_header("location", Routes.customer_path(conn, :show, ControllerHelpers.changeset_error_to_string(changeset)))
         |> render("show.json", error: ControllerHelpers.changeset_error_to_string(changeset))
       {:ok, customer} ->
         conn
         |> put_status(:created)
-        #|> put_resp_header("location", Routes.customer_path(conn, :show, customer))
+        |> put_resp_header("location", Routes.customer_path(conn, :show, customer.id))
         |> render("show.json", customer: customer)
     end
   end
@@ -67,8 +72,13 @@ defmodule PointsApiWeb.CustomerController do
     end
   end
 
-  def update(conn, %{"id" => id, "customer" => customer_params}) do
-    customer = Admin.get_customer!(id)
+  def update(conn, %{"customer" => customer_params}) do
+    customer = case Admin.get_customer(customer_params) do
+      nil ->
+        render(conn, "show.json", error: "No customer with those credentials")
+        |> halt()
+      customer -> customer
+    end
 
     with {:ok, %Customer{} = customer} <- Admin.update_customer(customer, customer_params) do
       render(conn, "show.json", customer: customer)
@@ -76,7 +86,12 @@ defmodule PointsApiWeb.CustomerController do
   end
 
   def update(conn, %{"customer" => customer_params, "amount" => amount}) do
-    customer = Admin.get_customer(customer_params)
+    customer = case Admin.get_customer(customer_params) do
+      nil ->
+        render(conn, "show.json", error: "No customer with those credentials")
+        |> halt()
+      customer -> customer
+    end
 
     case Admin.update_customer(customer, %{balance: customer.balance + amount}) do
       {:ok, update_customer} ->
