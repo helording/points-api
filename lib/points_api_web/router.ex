@@ -12,8 +12,10 @@ defmodule PointsApiWeb.Router do
     resources "/customers", CustomerController
     put "/customers", CustomerController, :update
     get "/customer", CustomerController, :show
+    delete "/customers", CustomerController, :delete
 
     post "/orders/new", OrderController, :create
+
   end
 
   # Enables LiveDashboard only for development
